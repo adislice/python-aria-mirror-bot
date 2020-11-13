@@ -17,6 +17,14 @@ def sendMessage(text: str, bot, update: Update):
         LOGGER.error(str(e))
 
 
+def sendMessageMarkup(text: str, markup, bot, update: Update):
+    try:
+        return bot.send_message(update.message.chat_id,
+                            reply_to_message_id=update.message.message_id,
+                            text=text, reply_markup=str(markup), parse_mode='HTML')
+    except Exception as e:
+        LOGGER.error(str(e))
+
 def editMessage(text: str, message: Message):
     try:
         bot.edit_message_text(text=text, message_id=message.message_id,

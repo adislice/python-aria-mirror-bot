@@ -21,6 +21,8 @@ from bot import parent_id, DOWNLOAD_DIR, IS_TEAM_DRIVE, INDEX_URL, \
 from bot.helper.ext_utils.bot_utils import *
 from bot.helper.ext_utils.fs_utils import get_mime_type
 
+from pyrogram import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
+
 LOGGER = logging.getLogger(__name__)
 logging.getLogger('googleapiclient.discovery').setLevel(logging.ERROR)
 SERVICE_ACCOUNT_INDEX = 0
@@ -300,14 +302,27 @@ class GoogleDriveHelper:
                     msg += f' | <a href="{url}"> Index URL</a>'
             else:
                 file = self.copyFile(meta.get('id'), parent_id)
-                msg += f'<a href="{self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))}">{file.get("name")}</a>'
+                msg += f'✅ Upload Success!\n\n' + \
+                       f'Filename : <code>{file.get("name")}</code>\n'
+                reply_button=[
+                    [
+                        InlineKeyboardButton(
+                            "Drive Link",
+                            url=f'{self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))}'
+                        )
+                    ],
+                ]
                 try:
-                    msg += f' ({get_readable_file_size(int(meta.get("size")))}) '
+                    msg += f'Size : <code>({get_readable_file_size(int(meta.get("size")))})</code> '
                 except TypeError:
                     pass
                 if INDEX_URL is not None:
                         url = requests.utils.requote_uri(f'{INDEX_URL}/{file.get("name")}')
-                        msg += f' | <a href="{url}"> Index URL</a>'
+                        index_button=InlineKeyboardButton(
+                            "Index Link",
+                            url=f'{url}'
+                        )
+                        reply_button[0].append(index_button)
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
@@ -315,7 +330,8 @@ class GoogleDriveHelper:
             err = str(err).replace('>', '').replace('<', '')
             LOGGER.error(err)
             return err
-        return msg
+        reply_markup=InlineKeyboardMarkup(reply_button)
+        return msg,reply_markup
 
     def cloneFolder(self, name, local_path, folder_id, parent_id):
         LOGGER.info(f"Syncing: {local_path}")
