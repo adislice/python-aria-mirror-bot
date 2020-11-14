@@ -17,6 +17,7 @@ from bot.helper.mirror_utils.upload_utils import gdriveTools
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import *
+from pyrogram import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 import pathlib
 import os
 import subprocess
@@ -134,13 +135,27 @@ class MirrorListener(listeners.MirrorListeners):
 
     def onUploadComplete(self, link: str):
         with download_dict_lock:
-            msg = f'<a href="{link}">{download_dict[self.uid].name()}</a> ({download_dict[self.uid].size()})'
+            msg = f'✅ Upload Success!\n\n' + \
+                  f'Filename : <code>{download_dict[self.uid].name()}</code>\n' + \
+                  f'Size     : <code>{download_dict[self.uid].size()}</code>\n'
+            reply_button=[
+                [
+                    InlineKeyboardButton(
+                        "Drive Link",
+                        url=f'{link}'
+                    )
+                ],
+            ]
             LOGGER.info(f'Done Uploading {download_dict[self.uid].name()}')
             if INDEX_URL is not None:
                 share_url = requests.utils.requote_uri(f'{INDEX_URL}/{download_dict[self.uid].name()}')
                 if os.path.isdir(f'{DOWNLOAD_DIR}/{self.uid}/{download_dict[self.uid].name()}'):
                     share_url += '/'
-                msg += f'\n\n Shareable link: <a href="{share_url}">here</a>'
+                index_button=InlineKeyboardButton(
+                    "Index Link",
+                    url=f'{share_url}'
+                )
+                reply_button[0].append(index_button)
             if self.tag is not None:
                 msg += f'\ncc: @{self.tag}'
             try:
@@ -149,7 +164,8 @@ class MirrorListener(listeners.MirrorListeners):
                 pass
             del download_dict[self.uid]
             count = len(download_dict)
-        sendMessage(msg, self.bot, self.update)
+        reply_markup=InlineKeyboardMarkup(reply_button)
+        sendMessageMarkup(msg, reply_markup, self.bot, self.update)
         if count == 0:
             self.clean()
         else:

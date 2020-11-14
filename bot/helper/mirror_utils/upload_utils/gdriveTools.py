@@ -313,7 +313,7 @@ class GoogleDriveHelper:
                     ],
                 ]
                 try:
-                    msg += f'Size : <code>({get_readable_file_size(int(meta.get("size")))})</code> '
+                    msg += f'Size     : <code>({get_readable_file_size(int(meta.get("size")))})</code> '
                 except TypeError:
                     pass
                 if INDEX_URL is not None:
