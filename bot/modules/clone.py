@@ -10,6 +10,7 @@ from bot import dispatcher
 @new_thread
 def cloneNode(update,context):
     args = update.message.text.split(" ",maxsplit=1)
+    tag = update.message.from_user.username
     if len(args) > 1:
         link = args[1]
         msg = sendMessage(f"✨ Cloning: <code>{link}</code>",context.bot,update)
@@ -18,6 +19,7 @@ def cloneNode(update,context):
         deleteMessage(context.bot,msg)
         text = result[0]
         markup = result[1]
+        text += f'\n\ncc: @{tag}'
         sendMessageMarkup(text,markup,context.bot,update)
     else:
         sendMessage("⚠ Provide Google Drive Shareable Link to Clone.",context.bot,update)

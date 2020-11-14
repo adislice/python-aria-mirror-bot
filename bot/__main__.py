@@ -14,6 +14,7 @@ from bot.helper.telegram_helper.message_utils import *
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
 from .helper.telegram_helper.filters import CustomFilters
 from .modules import authorize, list, cancel_mirror, mirror_status, mirror, clone, watch
+from pyrogram import __version__
 
 
 @run_async
@@ -25,12 +26,12 @@ def stats(update, context):
     free = get_readable_file_size(free)
     cpuUsage = psutil.cpu_percent(interval=0.5)
     memory = psutil.virtual_memory().percent
-    stats = f'Bot Uptime: {currentTime}\n' \
-            f'Total disk space: {total}\n' \
-            f'Used: {used}\n' \
-            f'Free: {free}\n' \
-            f'CPU: {cpuUsage}%\n' \
-            f'RAM: {memory}%'
+    stats = f'⏳ Bot Uptime: {currentTime}\n' \
+            f'💾 Total disk space: {total}\n' \
+            f'📂 Used: {used}\n' \
+            f'📁 Free: {free}\n' \
+            f'📊 CPU: {cpuUsage}%\n' \
+            f'📈 RAM: {memory}%'
     sendMessage(stats, context.bot, update)
 
 

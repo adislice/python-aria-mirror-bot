@@ -302,7 +302,7 @@ class GoogleDriveHelper:
                     msg += f' | <a href="{url}"> Index URL</a>'
             else:
                 file = self.copyFile(meta.get('id'), parent_id)
-                msg += f'✅ Upload Success!\n\n' + \
+                msg += f'✅ Clone Success!\n\n' + \
                        f'Filename : <code>{file.get("name")}</code>\n'
                 reply_button=[
                     [
@@ -313,7 +313,7 @@ class GoogleDriveHelper:
                     ],
                 ]
                 try:
-                    msg += f'Size     : <code>({get_readable_file_size(int(meta.get("size")))})</code> '
+                    msg += f'Size : <code>({get_readable_file_size(int(meta.get("size")))})</code> '
                 except TypeError:
                     pass
                 if INDEX_URL is not None:

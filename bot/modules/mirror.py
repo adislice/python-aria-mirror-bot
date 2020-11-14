@@ -137,7 +137,7 @@ class MirrorListener(listeners.MirrorListeners):
         with download_dict_lock:
             msg = f'✅ Upload Success!\n\n' + \
                   f'Filename : <code>{download_dict[self.uid].name()}</code>\n' + \
-                  f'Size     : <code>{download_dict[self.uid].size()}</code>\n'
+                  f'Size : <code>{download_dict[self.uid].size()}</code>\n'
             reply_button=[
                 [
                     InlineKeyboardButton(
