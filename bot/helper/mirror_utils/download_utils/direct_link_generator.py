@@ -3,6 +3,8 @@
 # Licensed under the Raphielscape Public License, Version 1.c (the "License");
 # you may not use this file except in compliance with the License.
 #
+# Credits to @aryanvikash for zippyshare
+#
 """ Helper Module containing various sites direct links generators. This module is copied and modified as per need
 from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no credit of the following code other
 than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
@@ -18,6 +20,17 @@ import requests
 from bs4 import BeautifulSoup
 
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+
+_REGEX_LINK = r"https://www(\d{1,3}).zippyshare.com/v/(\w{8})/file.html"
+_REGEX_RESULT = (
+    r"var a = (\d+);[\s\S]+document.getElementById\(\'dlbutton\'\).href"
+    r' = "/d/\w{8}/.+/(.*)";'
+)
+_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
+    "/75.0.3770.100 Safari/537.36"
+}
 
 
 def direct_link_generator(link: str):
@@ -41,29 +54,25 @@ def direct_link_generator(link: str):
 
 
 def zippy_share(url: str) -> str:
-    """ ZippyShare direct links generator
-    Based on https://github.com/LameLemon/ziggy"""
     dl_url = ''
-    try:
-        link = re.findall(r'\bhttps?://.*zippyshare\.com\S+', url)[0]
-    except IndexError:
-        raise DirectDownloadLinkException("`No ZippyShare links found`\n")
     session = requests.Session()
-    base_url = re.search('http.+.com', link).group()
-    response = session.get(link)
-    page_soup = BeautifulSoup(response.content, "lxml")
-    scripts = page_soup.find_all("script", {"type": "text/javascript"})
-    for script in scripts:
-        if "getElementById('dlbutton')" in script.text:
-            url_raw = re.search(r'= (?P<url>\".+\" \+ (?P<math>\(.+\)) .+);',
-                                script.text).group('url')
-            math = re.search(r'= (?P<url>\".+\" \+ (?P<math>\(.+\)) .+);',
-                             script.text).group('math')
-            dl_url = url_raw.replace(math, '"' + str(eval(math)) + '"')
-            break
-    dl_url = base_url + eval(dl_url)
-    name = urllib.parse.unquote(dl_url.split('/')[-1])
-    return dl_url
+    session.headers.update(_HEADERS)
+    with session as ses:
+        match = re.match(_REGEX_LINK, url)
+        if not match:
+            raise ValueError("Invalid URL: " + str(url))
+        server, id_ = match.group(1), match.group(2)
+        res = ses.get(url)
+        res.raise_for_status()
+        match = re.search(_REGEX_RESULT, res.text)
+        if not match:
+            raise ValueError("Invalid Response!")
+        val, name = int(match.group(1)), match.group(2)
+        d_l = "https://www{}.zippyshare.com/d/{}/{}/{}".format(
+            server, id_, val ** 3 + 3, name
+        )
+    name = urllib.parse.unquote(d_l.split("/")[-1])
+    return d_l
 
 
 def yandex_disk(url: str) -> str:
