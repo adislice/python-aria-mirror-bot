@@ -299,6 +299,7 @@ class GoogleDriveHelper:
                         f' ({get_readable_file_size(self.transferred_size)})'
                 if INDEX_URL is not None:
                     url = requests.utils.requote_uri(f'{INDEX_URL}/{meta.get("name")}/')
+                    url = url.replace("#","%23")
                     msg += f' | <a href="{url}"> Index URL</a>'
             else:
                 file = self.copyFile(meta.get('id'), parent_id)
@@ -318,6 +319,7 @@ class GoogleDriveHelper:
                     pass
                 if INDEX_URL is not None:
                         url = requests.utils.requote_uri(f'{INDEX_URL}/{file.get("name")}')
+                        url = url.replace("#", "%23")
                         index_button=InlineKeyboardButton(
                             "Index Link",
                             url=f'{url}'
@@ -448,12 +450,14 @@ class GoogleDriveHelper:
                        f"</a> (folder)"
                 if INDEX_URL is not None:
                     url = requests.utils.requote_uri(f'{INDEX_URL}/{file.get("name")}/')
+                    url = url.replace("#", "%23")
                     msg += f' | <a href="{url}"> Index URL</a>'
             else:
                 msg += f"⁍ <a href='https://drive.google.com/uc?id={file.get('id')}" \
                        f"&export=download'>{file.get('name')}</a> ({get_readable_file_size(int(file.get('size')))})"
                 if INDEX_URL is not None:
                     url = requests.utils.requote_uri(f'{INDEX_URL}/{file.get("name")}')
+                    url = url.replace("#", "%23")
                     msg += f' | <a href="{url}"> Index URL</a>'
             msg += '\n'
         return msg

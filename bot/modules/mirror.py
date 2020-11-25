@@ -151,6 +151,7 @@ class MirrorListener(listeners.MirrorListeners):
                 share_url = requests.utils.requote_uri(f'{INDEX_URL}/{download_dict[self.uid].name()}')
                 if os.path.isdir(f'{DOWNLOAD_DIR}/{self.uid}/{download_dict[self.uid].name()}'):
                     share_url += '/'
+                share_url = share_url.replace("#", "%23")
                 index_button=InlineKeyboardButton(
                     "Index Link",
                     url=f'{share_url}'
