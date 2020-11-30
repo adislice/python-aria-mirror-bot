@@ -66,6 +66,15 @@ def ping(update, context):
 def log(update, context):
     sendLogFile(context.bot, update)
 
+@run_async
+def get_auth(update, context):
+    if os.path.exists('authorized_chats.txt'):
+        with open('authorized_chats.txt', 'rb') as f:
+            bot.send_document(document=f, filename=f.name,
+                              reply_to_message_id=update.message.message_id,
+                              chat_id=update.message.chat_id)
+    else:
+        sendMessage('No authorized chat',context.bot, update)
 
 @run_async
 def bot_help(update, context):
@@ -118,6 +127,7 @@ def main():
     stats_handler = CommandHandler(BotCommands.StatsCommand,
                                    stats, filters=CustomFilters.authorized_chat | CustomFilters.authorized_user)
     log_handler = CommandHandler(BotCommands.LogCommand, log, filters=CustomFilters.owner_filter)
+    get_auth = CommandHandler(BotCommands.GetAuth, get_auth, filters=None)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(ping_handler)
     dispatcher.add_handler(restart_handler)
