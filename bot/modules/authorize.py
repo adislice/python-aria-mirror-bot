@@ -27,7 +27,7 @@ def authorize(update,context):
         else:
             # Trying to authorize someone in specific
             if len(message_args) > 1:
-                user_id = message_args[1]
+                user_id = int(message_args[1])
             else:
                 user_id = reply_message.from_user.id
             if user_id not in AUTHORIZED_CHATS:
